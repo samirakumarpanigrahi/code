@@ -1,0 +1,45 @@
+
+    
+
+@Configuration
+@EnableSwagger2
+public class SwaggerConfig {​
+    public SwaggerConfig() {​
+    }​
+    @Bean
+    public Docket apiDocket() {​
+        return (new Docket(DocumentationType.SWAGGER_2)).select().apis(RequestHandlerSelectors.basePackage("org.mindtree.platform")).paths(PathSelectors.regex("/api/.*")).build().securitySchemes(Lists.newArrayList(new ApiKey[]{​this.userJwt()}​)).securityContexts(Lists.newArrayList(new SecurityContext[]{​this.jwtSecurityContext()}​));
+}​
+    private SecurityContext jwtSecurityContext() {​
+        return SecurityContext.builder().securityReferences(this.jwtSecurityReference()).forPaths(this.pathPredicateForJWT()).build();
+}​
+    private Predicate<String> pathPredicateForJWT() {​
+        return PathSelectors.regex("/api/.*");
+}​
+    private List<SecurityReference> jwtSecurityReference() {​
+        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
+AuthorizationScope[] authorizationScopes = new AuthorizationScope[]{​authorizationScope}​;
+        return Lists.newArrayList(new SecurityReference[]{​new SecurityReference("User JWT or Session ID", authorizationScopes)}​);
+}​
+    private ApiKey userJwt() {​
+        return new ApiKey("User JWT or Session ID", "Authorization", "header");
+}​
+}
+    
+
+import springfox.documentation.spi.service.contexts.SecurityContext;
+
+
+
+
+<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.9.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.9.2</version>
+		</dependency>
